@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/orblazer/harbor-cli/api"
+	"github.com/orblazer/harbor-cli/commands"
 )
 
 // flags
@@ -15,11 +16,13 @@ var (
 	password string
 	url      string
 
-	testCmd = flag.NewFlagSet("test", flag.ExitOnError)
+	scanCmd = flag.NewFlagSet("scan", flag.ExitOnError)
+
+	scanSeverity = scanCmd.String("severity", "Critical", "The maximum severity level accepted. Level: None, Low, Medium, High, Critical")
 )
 
 var subcommands = map[string]*flag.FlagSet{
-	testCmd.Name(): testCmd,
+	scanCmd.Name(): scanCmd,
 }
 
 var apiClient *api.Client
@@ -56,8 +59,8 @@ func main() {
 	apiClient = api.NewClient(url, username, password)
 
 	switch cmd.Name() {
-	case "test":
-		log.Println("Hello World!")
+	case "scan":
+		commands.Scan(apiClient, url, *scanSeverity, cmd.Args())
 	}
 }
 
