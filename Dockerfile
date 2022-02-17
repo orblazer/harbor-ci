@@ -20,7 +20,7 @@ COPY src/go.mod .
 COPY src .
 
 # Build image
-RUN CGO_ENABLED=0 go build -o /harbor-ci \
+RUN CGO_ENABLED=0 go build -o /harbor-cli \
   -ldflags="-X 'github.com/orblazer/harbor-cli/build.Version=$VERSION' \
   -X 'github.com/orblazer/harbor-cli/build.Time=$BUILDTIME' \
   -X 'github.com/orblazer/harbor-cli/build.Revision=$REVISION'"
@@ -30,7 +30,7 @@ RUN CGO_ENABLED=0 go build -o /harbor-ci \
 ##
 FROM scratch
 
-COPY --from=build /harbor-ci /usr/local/bin/harbor-ci
+COPY --from=build /harbor-cli /usr/local/bin/harbor-cli
 
 COPY --from=busybox:1.34.1 /bin /busybox
 # Since busybox needs some lib files which lie in /lib directory to run the executables on s390x,
@@ -50,4 +50,4 @@ WORKDIR /workspace
 RUN ["/busybox/mkdir", "-p", "/bin"]
 RUN ["/busybox/ln", "-s", "/busybox/sh", "/bin/sh"]
 
-ENTRYPOINT [ "harbor-ci" ]
+ENTRYPOINT [ "harbor-cli" ]

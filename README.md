@@ -40,7 +40,7 @@ This run artifact and return
 ### Usage
 
 ```sh
-harbor-ci scan -username='<username>' -password='<password>' -url='<harbor-url>' <docker-image>
+harbor-cli scan -username='<username>' -password='<password>' -url='<harbor-url>' <docker-image>
 ```
 
 ### Arguments
@@ -51,7 +51,7 @@ harbor-ci scan -username='<username>' -password='<password>' -url='<harbor-url>'
 ### Example
 
 ```sh
-$ harbor-ci scan -username='robot$ci' -password='robot-password' -url='https://example.net/' -severity=High example/example-repo:latest
+$ harbor-cli scan -username='robot$ci' -password='robot-password' -url='https://example.net/' -severity=High example/example-repo:latest
 
 Scanning image...
 +===============================================+
