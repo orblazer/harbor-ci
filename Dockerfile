@@ -3,7 +3,7 @@
 ##
 ## Build
 ##
-FROM golang:1.17 as build
+FROM golang:1.17-alpine as build
 
 ARG VERSION
 ARG BUILDTIME
