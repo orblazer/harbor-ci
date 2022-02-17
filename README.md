@@ -59,12 +59,6 @@ container_scanning:
     - allow_failure: false
 ```
 
-## Common arguments
-
-- `-username=<username>`: **(REQUIRED)** Define the harbor username
-- `-password=<password>`: **(REQUIRED)** Define the harbor password
-- `-url=<url>`: **(REQUIRED)** Define the harbor url
-
 ## Scan artifact
 
 This run artifact and return
@@ -76,6 +70,8 @@ harbor-cli scan -username='<username>' -password='<password>' -url='<harbor-url>
 ```
 
 ### Arguments
+
+See [Common arguments](#common-arguments)
 
 - `-severity=<severity>`: _(Default: `Critical`)_ The maximum severity level accepted.
   **Level**: `None`, `Low`, `Medium`, `High`, `Critical`
@@ -103,3 +99,9 @@ Scanning image...
 +===============================================+
 exit status 1
 ```
+
+## Common arguments
+
+- `-username=<username>`: **(REQUIRED)** Define the harbor username
+- `-password=<password>`: **(REQUIRED)** Define the harbor password
+- `-url=<url>`: **(REQUIRED)** Define the harbor url
