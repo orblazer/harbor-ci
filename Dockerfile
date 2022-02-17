@@ -5,6 +5,10 @@
 ##
 FROM golang:1.17 as build
 
+ARG VERSION
+ARG BUILDTIME
+ARG REVISION
+
 WORKDIR /src
 
 # Download mod
@@ -16,7 +20,8 @@ RUN go mod download
 COPY src/**/*.go .
 
 # Build image
-RUN CGO_ENABLED=0 go build -o /harbor-ci
+RUN CGO_ENABLED=0 go build -o /harbor-ci \
+  -ldflags="-X 'src/build.Version=$VERSION' -X 'app/build.Time=$BUILDTIME' -X 'app/build.Revision=$REVISION'"
 
 ##
 ## Deploy

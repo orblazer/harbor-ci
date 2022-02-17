@@ -17,12 +17,14 @@ var (
 	url      string
 
 	scanCmd = flag.NewFlagSet("scan", flag.ExitOnError)
+	versCmd = flag.NewFlagSet("version", flag.ExitOnError)
 
 	scanSeverity = scanCmd.String("severity", "Critical", "The maximum severity level accepted. Level: None, Low, Medium, High, Critical")
 )
 
 var subcommands = map[string]*flag.FlagSet{
 	scanCmd.Name(): scanCmd,
+	versCmd.Name(): versCmd,
 }
 
 var apiClient *api.Client
@@ -39,28 +41,32 @@ func main() {
 	// Parse flags
 	cmd.Parse(os.Args[2:])
 
-	// Require credentials
-	if username == "" {
-		log.Fatal("[ERROR] missing argument: -username")
-	}
-	if password == "" {
-		log.Fatal("[ERROR] missing argument: -password")
-	}
-	if url == "" {
-		log.Fatal("[ERROR] missing argument: -url")
-	}
+	if cmd.Name() != "version" {
+		// Require credentials
+		if username == "" {
+			log.Fatal("[ERROR] missing argument: -username")
+		}
+		if password == "" {
+			log.Fatal("[ERROR] missing argument: -password")
+		}
+		if url == "" {
+			log.Fatal("[ERROR] missing argument: -url")
+		}
 
-	// Fix url
-	if !strings.HasSuffix(url, "/") {
-		url += "/"
-	}
+		// Fix url
+		if !strings.HasSuffix(url, "/") {
+			url += "/"
+		}
 
-	// Create api client
-	apiClient = api.NewClient(url, username, password)
+		// Create api client
+		apiClient = api.NewClient(url, username, password)
+	}
 
 	switch cmd.Name() {
 	case "scan":
 		commands.Scan(apiClient, url, *scanSeverity, cmd.Args())
+	case "version":
+		commands.Version()
 	}
 }
 
