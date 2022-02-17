@@ -13,15 +13,17 @@ WORKDIR /src
 
 # Download mod
 COPY src/go.mod .
-COPY src/go.sum .
-RUN go mod download
+# COPY src/go.sum .
+# RUN go mod download
 
 # Copy source
-COPY src/**/*.go .
+COPY src .
 
 # Build image
 RUN CGO_ENABLED=0 go build -o /harbor-ci \
-  -ldflags="-X 'src/build.Version=$VERSION' -X 'app/build.Time=$BUILDTIME' -X 'app/build.Revision=$REVISION'"
+  -ldflags="-X 'github.com/orblazer/harbor-cli/build.Version=$VERSION' \
+  -X 'github.com/orblazer/harbor-cli/build.Time=$BUILDTIME' \
+  -X 'github.com/orblazer/harbor-cli/build.Revision=$REVISION'"
 
 ##
 ## Deploy
