@@ -6,6 +6,27 @@ This project add some commands for include it in CI/CD.
 
 - Scan artifact
 
+## Setup the rebot
+
+Due to missing GUI for some permissions (cf. [Harbor issue #8723](https://github.com/goharbor/harbor/issues/8723)), please use the follow step for create your bot.
+
+**/!\ IMPORTANT**: The OIDC account is not supported.
+
+1. Download script [create-bot.sh](./create-bot.sh)
+2. execute script :
+
+   ```sh
+   ./create-bot.sh <harbor-url> [project-id]
+   ```
+
+   **Arguments** :
+
+   - `harbor-url`: **(REQUIRED)** Define the harbor url
+   - `project-id`: The project id for project bot
+
+3. Fill the questions
+4. Done!
+
 ## Common arguments
 
 - `-username=<username>`: **(REQUIRED)** Define the harbor username
