@@ -27,6 +27,38 @@ Due to missing GUI for some permissions (cf. [Harbor issue #8723](https://github
 3. Fill the questions
 4. Done!
 
+## Commands usage
+
+### Run in docker
+
+```sh
+docker run --rm orblazer:latest [cmd arguments]
+```
+
+### Gitlab CI
+
+```yml
+container_scanning:
+  image:
+    name: orblazer/harbor-cli:latest
+    entrypoint: ['']
+  stage: test
+  variables:
+    # No need to clone the repo, we exclusively work on artifacts.  See
+    # https://docs.gitlab.com/ee/ci/runners/README.html#git-strategy
+    GIT_STRATEGY: none
+    HARBOR_USERNAME: $CI_REGISTRY_USER
+    HARBOR_PASSWORD: $CI_REGISTRY_PASSWORD
+    HARBOR_URL: $CI_REGISTRY
+    FULL_IMAGE_NAME: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+  script:
+    - harbor-cli --version
+    # Running scan
+    - harbor-cli scan -username="$HARBOR_USERNAME" -password="$HARBOR_PASSWORD" -url="$HARBOR_URL" $FULL_IMAGE_NAME
+  rules:
+    - allow_failure: false
+```
+
 ## Common arguments
 
 - `-username=<username>`: **(REQUIRED)** Define the harbor username
