@@ -26,11 +26,23 @@ RUN CGO_ENABLED=0 go build -o /harbor-cli \
   -X 'github.com/orblazer/harbor-cli/build.Revision=$REVISION'"
 
 ##
+## Generate latest ca-certificates
+##
+
+FROM debian:buster-slim AS certs
+
+RUN \
+  apt update && \
+  apt install -y ca-certificates && \
+  cat /etc/ssl/certs/* > /ca-certificates.crt
+
+##
 ## Deploy
 ##
 FROM scratch
 
 COPY --from=build /harbor-cli /usr/local/bin/harbor-cli
+COPY --from=certs /ca-certificates.crt /etc/ssl/certs/
 
 COPY --from=busybox:1.34.1 /bin /busybox
 # Since busybox needs some lib files which lie in /lib directory to run the executables on s390x,
