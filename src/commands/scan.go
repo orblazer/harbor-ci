@@ -194,7 +194,7 @@ func runScan(c *api.Client, project, repository, reference string) error {
 	}
 
 	if err := c.SendRequest(req, nil); err != nil {
-		if err.Error() != "FORBIDDEN: forbidden" { // Convert to more readable
+		if err.Error() == "FORBIDDEN: forbidden" { // Convert to more readable
 			return fmt.Errorf("FORBIDDEN: Missing 'create' action on 'scan' resource (/project/%s/scan)", project)
 		} else if err.Error() != "EOF" {
 			return err
@@ -214,7 +214,7 @@ func getSummary(c *api.Client, project, repository, reference string) (summary, 
 
 	var res summary
 	if err := c.SendRequest(req, &res); err != nil {
-		if err.Error() != "FORBIDDEN: forbidden" { // Convert to more readable
+		if err.Error() == "FORBIDDEN: forbidden" { // Convert to more readable
 			err = fmt.Errorf("FORBIDDEN: Missing 'read' action on 'artifact' resource (/project/%s/artifact)", project)
 		}
 
