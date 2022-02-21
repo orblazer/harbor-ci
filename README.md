@@ -52,7 +52,7 @@ container_scanning:
     HARBOR_URL: $CI_REGISTRY
     FULL_IMAGE_NAME: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
   script:
-    - harbor-cli --version
+    - harbor-cli version
     # Running scan
     - harbor-cli scan -username="$HARBOR_USERNAME" -password="$HARBOR_PASSWORD" -url="$HARBOR_URL" $FULL_IMAGE_NAME
   rules:
