@@ -32,7 +32,7 @@ Due to missing GUI for some permissions (cf. [Harbor issue #8723](https://github
 ### Run in docker
 
 ```sh
-docker run --rm orblazer:latest [cmd arguments]
+docker run --rm orblazer/harbor-ci:latest [cmd arguments]
 ```
 
 ### Gitlab CI
@@ -40,7 +40,7 @@ docker run --rm orblazer:latest [cmd arguments]
 ```yml
 container_scanning:
   image:
-    name: orblazer/harbor-cli:latest
+    name: orblazer/harbor-ci:latest
     entrypoint: ['']
   stage: test
   variables:
