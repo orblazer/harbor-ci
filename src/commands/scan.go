@@ -15,7 +15,6 @@ import (
 var (
 	// Original : `(?i)^(?:((?:(?:(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])|(?:[a-z][a-z0-9\-]{0,48}[a-z0-9]\.){1,4}(?:[a-z]|[a-z][a-z0-9\-]{0,48}[a-z0-9])|localhost)(?::[0-9]+)?)/)?([0-9a-z_-]{1,40}(?:/[0-9a-z_-]{1,40})*)(?::([a-z0-9][a-z0-9._-]{1,38}[a-z0-9]))?(?:@sha256:([0-9a-f]{64}))?$``
 	imageRe    = regexp.MustCompile(`(?i)^(?P<image>[0-9a-z_-]{1,40}(?:/[0-9a-z_-]{1,40})*)(?::(?P<tag>[a-z0-9][a-z0-9._-]{1,38}[a-z0-9]))?(?:@(?P<digest>sha256:[0-9a-f]{64}))?$`)
-	delSchemRe = regexp.MustCompile("^https?://(.*)/")
 
 	checkInterval      = 3 * time.Second
 	supportedMimeTypes = "application/vnd.security.vulnerability.report; version=1.1, application/vnd.scanner.adapter.vuln.report.harbor+json; version=1.0"
@@ -64,14 +63,14 @@ const (
 	Critical
 )
 
-func Scan(c *api.Client, baseUrl, rSeverity string, args []string) {
+func Scan(c *api.Client, registryUrl, rSeverity string, args []string) {
 	if len(args) < 1 {
 		log.Fatal("[ERROR] missing image argument. Usage: harbor-cli scan <image>")
 	}
 	maxSevName, maxSeverity := parseSeverity(rSeverity)
 
 	// Remove registry from image
-	re := regexp.MustCompile(fmt.Sprintf("^(https?://)?%s/", delSchemRe.ReplaceAllString(baseUrl, "$1")))
+	re := regexp.MustCompile(fmt.Sprintf("^(https?://)?%s/", registryUrl))
 	image := re.ReplaceAllString(args[0], "")
 
 	// Parse image
@@ -116,11 +115,11 @@ func Scan(c *api.Client, baseUrl, rSeverity string, args []string) {
 				log.Println("|                  Scan report                  |")
 				log.Println("+===============================================+")
 				// Print artifact url
-				log.Printf("| Artifact url: %sharbor/projects/%d/repositories/%s/artifacts/%s\n\n", baseUrl, res.ProjectId,
+				log.Printf("| Artifact url: %sharbor/projects/%d/repositories/%s/artifacts/%s\n\n", c.ClientUrl, res.ProjectId,
 					repository, res.Digest)
 				log.Println("|")
 				log.Printf("| Vulnerability Severity: %s", sevName)
-				printSummary(report, baseUrl)
+				printSummary(report)
 
 				close(quit)
 			} else if report.Status == "Error" {
@@ -225,7 +224,7 @@ func getSummary(c *api.Client, project, repository, reference string) (summary, 
 	return res, nil
 }
 
-func printSummary(report scanReport, baseUrl string) {
+func printSummary(report scanReport) {
 	log.Printf("| Total: %d (UNKNOWN: %d, LOW: %d, MEDIUM: %d, HIGH: %d, CRITICAL: %d)", report.Summary.Total,
 		report.Summary.Summary.None, report.Summary.Summary.Low, report.Summary.Summary.Medium, report.Summary.Summary.High,
 		report.Summary.Summary.Critical)

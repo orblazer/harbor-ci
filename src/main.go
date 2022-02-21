@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log"
+	"net/url"
 	"os"
 	"strings"
 
@@ -14,7 +15,7 @@ import (
 var (
 	username string
 	password string
-	url      string
+	apiUrl      string
 
 	scanCmd = flag.NewFlagSet("scan", flag.ExitOnError)
 	versCmd = flag.NewFlagSet("version", flag.ExitOnError)
@@ -49,22 +50,27 @@ func main() {
 		if password == "" {
 			log.Fatal("[ERROR] missing argument: -password")
 		}
-		if url == "" {
+		if apiUrl == "" {
 			log.Fatal("[ERROR] missing argument: -url")
 		}
 
 		// Fix url
-		if !strings.HasSuffix(url, "/") {
-			url += "/"
+		if !strings.Contains(apiUrl, "//") {
+			apiUrl = "https://" + apiUrl + "/test"
 		}
+		url, err := url.Parse(apiUrl)
+		if err != nil {
+			log.Fatal("[ERROR] Invalid url.")
+		}
+		apiUrl = url.Host
 
 		// Create api client
-		apiClient = api.NewClient(url, username, password)
+		apiClient = api.NewClient(url.Scheme + "://" + url.Host, username, password)
 	}
 
 	switch cmd.Name() {
 	case "scan":
-		commands.Scan(apiClient, url, *scanSeverity, cmd.Args())
+		commands.Scan(apiClient, apiUrl, *scanSeverity, cmd.Args())
 	case "version":
 		commands.Version()
 	}
@@ -74,6 +80,6 @@ func setupCommonFlags() {
 	for _, fs := range subcommands {
 		fs.StringVar(&username, "username", "", "The username")
 		fs.StringVar(&password, "password", "", "The password")
-		fs.StringVar(&url, "url", "", "The api base url")
+		fs.StringVar(&apiUrl, "url", "", "The api base url")
 	}
 }

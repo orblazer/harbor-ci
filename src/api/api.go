@@ -7,7 +7,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"regexp"
 )
+
+var UrlRegex = regexp.MustCompile("^https?://(.*)/")
 
 type errorObject struct {
 	Code    string `json:"code"`
@@ -19,6 +22,7 @@ type errorResponse struct {
 }
 
 type Client struct {
+	ClientUrl string
 	baseUrl  string
 	username string
 	password string
@@ -28,7 +32,8 @@ type Client struct {
 
 func NewClient(url, username, password string) *Client {
 	return &Client{
-		baseUrl:  url + "api/v2.0",
+		ClientUrl: url,
+		baseUrl:  url + "/api/v2.0",
 		username: username,
 		password: password,
 
