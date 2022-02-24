@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json
+variables:
+  # HARBOR_REGISTRY: registry.domain.tld
+  # HARBOR_REGISTRY_USER: username
+  # HARBOR_REGISTRY_PASSWORD: password
+  HARBOR_REGISTRY_IMAGE: $HARBOR_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
+  FULL_IMAGE_NAME: "${HARBOR_REGISTRY_IMAGE}:latest"
+  SCAN_MAX_SEVERITY: Critical
+
+build_and_deploy:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  before_script:
+    - echo "{\"auths\":{\"${HARBOR_REGISTRY}\":{\"auth\":\"$(echo -n "${HARBOR_REGISTRY_USER}:${HARBOR_REGISTRY_PASSWORD}" | base64)\"}}}" > /kaniko/.docker/config.json
+  script:
+    - >-
+      /kaniko/executor --cache
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+      --destination "${FULL_IMAGE_NAME}"
+  rules:
+    - allow_failure: false
+
+container_scanning:
+  image:
+    name: orblazer/harbor-ci:latest
+    entrypoint: [""]
+  stage: scan
+  variables:
+    # No need to clone the repo, we exclusively work on artifacts.  See
+    # https://docs.gitlab.com/ee/ci/runners/README.html#git-strategy
+    GIT_STRATEGY: none
+  script:
+    - harbor-cli version
+    # Running scan
+    - harbor-cli scan -username="${HARBOR_REGISTRY_USER}" -password="${HARBOR_REGISTRY_PASSWORD}" -url="${HARBOR_REGISTRY}" -severity="${SCAN_MAX_SEVERITY}" ${FULL_IMAGE_NAME}
+  rules:
+    - allow_failure: false

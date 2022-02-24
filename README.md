@@ -38,26 +38,16 @@ docker run --rm orblazer/harbor-ci:latest [cmd arguments]
 ### Gitlab CI
 
 ```yml
-container_scanning:
-  image:
-    name: orblazer/harbor-ci:latest
-    entrypoint: ['']
-  stage: test
-  variables:
-    # No need to clone the repo, we exclusively work on artifacts.  See
-    # https://docs.gitlab.com/ee/ci/runners/README.html#git-strategy
-    GIT_STRATEGY: none
-    HARBOR_USERNAME: $CI_REGISTRY_USER
-    HARBOR_PASSWORD: $CI_REGISTRY_PASSWORD
-    HARBOR_URL: $CI_REGISTRY
-    FULL_IMAGE_NAME: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
-  script:
-    - harbor-cli version
-    # Running scan
-    - harbor-cli scan -username="$HARBOR_USERNAME" -password="$HARBOR_PASSWORD" -url="$HARBOR_URL" $FULL_IMAGE_NAME
-  rules:
-    - allow_failure: false
+include:
+  - remote: 'https://raw.githubusercontent.com/orblazer/harbor-ci/main/utils/gitlab.yml'
 ```
+
+**/!\\ Requirement**: Define CI/CD env variables `HARBOR_REGISTRY`, `HARBOR_REGISTRY_USER` and `HARBOR_REGISTRY_PASSWORD`
+
+**Customization**:
+
+- `FULL_IMAGE_NAME`: is the name of image want built and scan
+- `SCAN_MAX_SEVERITY`: the maximum severity allowed in scan
 
 ## Scan artifact
 
