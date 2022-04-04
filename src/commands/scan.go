@@ -115,7 +115,7 @@ func Scan(c *api.Client, registryUrl, rSeverity string, args []string) {
 				log.Println("|                  Scan report                  |")
 				log.Println("+===============================================+")
 				// Print artifact url
-				log.Printf("| Artifact url: %sharbor/projects/%d/repositories/%s/artifacts/%s\n\n", c.ClientUrl, res.ProjectId,
+				log.Printf("| Artifact url: %s/harbor/projects/%d/repositories/%s/artifacts/%s\n\n", c.ClientUrl, res.ProjectId,
 					repository, res.Digest)
 				log.Println("|")
 				log.Printf("| Vulnerability Severity: %s", sevName)
